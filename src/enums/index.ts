@@ -1,0 +1,64 @@
+export enum Role {
+  SUPER_ADMIN = 'SUPER_ADMIN',
+  ADMIN = 'ADMIN',
+  EDITOR = 'EDITOR',
+  USER = 'USER',
+  GUEST = 'GUEST',
+}
+
+export enum Permission {
+  USER_CREATE = 'USER_CREATE',
+  USER_READ = 'USER_READ',
+  USER_UPDATE = 'USER_UPDATE',
+  USER_DELETE = 'USER_DELETE',
+  USER_MANAGE = 'USER_MANAGE',
+
+  FILE_UPLOAD = 'FILE_UPLOAD',
+  FILE_READ = 'FILE_READ',
+  FILE_UPDATE = 'FILE_UPDATE',
+  FILE_DELETE = 'FILE_DELETE',
+  FILE_DOWNLOAD = 'FILE_DOWNLOAD',
+  FILE_SHARE = 'FILE_SHARE',
+
+  FOLDER_CREATE = 'FOLDER_CREATE',
+  FOLDER_READ = 'FOLDER_READ',
+  FOLDER_UPDATE = 'FOLDER_UPDATE',
+  FOLDER_DELETE = 'FOLDER_DELETE',
+
+  CONVERSION_PDF_TO_WORD = 'CONVERSION_PDF_TO_WORD',
+  CONVERSION_IMAGE_TO_WORD = 'CONVERSION_IMAGE_TO_WORD',
+  CONVERSION_BATCH = 'CONVERSION_BATCH',
+
+  ROLE_MANAGE = 'ROLE_MANAGE',
+  PERMISSION_MANAGE = 'PERMISSION_MANAGE',
+  AUDIT_VIEW = 'AUDIT_VIEW',
+  SETTINGS_MANAGE = 'SETTINGS_MANAGE',
+}
+
+export const rolePermissions: Record<Role, Permission[]> = {
+  [Role.SUPER_ADMIN]: [Permission.ROLE_MANAGE, Permission.PERMISSION_MANAGE, Permission.AUDIT_VIEW, Permission.SETTINGS_MANAGE],
+  [Role.ADMIN]: [
+    Permission.USER_READ, Permission.USER_UPDATE, Permission.USER_MANAGE,
+    Permission.FILE_UPLOAD, Permission.FILE_READ, Permission.FILE_UPDATE, Permission.FILE_DELETE, Permission.FILE_DOWNLOAD, Permission.FILE_SHARE,
+    Permission.FOLDER_CREATE, Permission.FOLDER_READ, Permission.FOLDER_UPDATE, Permission.FOLDER_DELETE,
+    Permission.CONVERSION_PDF_TO_WORD, Permission.CONVERSION_IMAGE_TO_WORD, Permission.CONVERSION_BATCH,
+    Permission.AUDIT_VIEW, Permission.SETTINGS_MANAGE,
+  ],
+  [Role.EDITOR]: [
+    Permission.USER_READ, Permission.USER_UPDATE,
+    Permission.FILE_UPLOAD, Permission.FILE_READ, Permission.FILE_UPDATE, Permission.FILE_DELETE, Permission.FILE_DOWNLOAD, Permission.FILE_SHARE,
+    Permission.FOLDER_CREATE, Permission.FOLDER_READ, Permission.FOLDER_UPDATE, Permission.FOLDER_DELETE,
+    Permission.CONVERSION_PDF_TO_WORD, Permission.CONVERSION_IMAGE_TO_WORD, Permission.CONVERSION_BATCH,
+  ],
+  [Role.USER]: [
+    Permission.USER_READ, Permission.USER_UPDATE,
+    Permission.FILE_UPLOAD, Permission.FILE_READ, Permission.FILE_UPDATE, Permission.FILE_DELETE, Permission.FILE_DOWNLOAD, Permission.FILE_SHARE,
+    Permission.FOLDER_CREATE, Permission.FOLDER_READ, Permission.FOLDER_UPDATE, Permission.FOLDER_DELETE,
+    Permission.CONVERSION_PDF_TO_WORD, Permission.CONVERSION_IMAGE_TO_WORD,
+  ],
+  [Role.GUEST]: [
+    Permission.USER_READ,
+    Permission.FILE_READ, Permission.FILE_DOWNLOAD,
+    Permission.FOLDER_READ,
+  ],
+};

@@ -1,0 +1,52 @@
+# ============================================
+# ENVIRONMENT
+# Default is production. Copy this file to .env
+# For development, use .env.development or set NODE_ENV=development
+# ============================================
+NODE_ENV=production
+LOG_LEVEL=warn
+APP_NAME=file-storage-api
+APP_VERSION=1.0.0
+
+# ============================================
+# SERVER
+# ============================================
+PORT=3000
+HOST=0.0.0.0
+API_BASE_URL=https://your-domain.com
+
+# ============================================
+# SUPABASE (Database + Storage)
+# ============================================
+DATABASE_URL=postgresql://postgres:[YOUR-PASSWORD]@db.[YOUR-PROJECT-REF].supabase.co:5432/postgres
+SUPABASE_URL=https://[YOUR-PROJECT-REF].supabase.co
+SUPABASE_ANON_KEY=your-anon-key
+SUPABASE_SERVICE_KEY=your-service-key
+SUPABASE_BUCKET=files
+
+# ============================================
+# REDIS (Caching + Queue)
+# Use managed Redis for production
+# ============================================
+REDIS_URL=redis://your-redis-host:6379
+REDIS_HOST=your-redis-host
+REDIS_PORT=6379
+
+# ============================================
+# JWT Authentication
+# IMPORTANT: Use a strong, unique secret in production
+# ============================================
+JWT_SECRET=YOUR-VERY-LONG-AND-SECURE-JWT-SECRET-KEY-HERE
+JWT_EXPIRES_IN=15m
+JWT_REFRESH_EXPIRES_IN=7d
+
+# ============================================
+# File Upload Settings
+# ============================================
+MAX_FILE_SIZE=52428800
+CORS_ORIGIN=https://your-domain.com,https://www.your-domain.com
+
+# ============================================
+# Logging
+# ============================================
+LOG_FILE_PATH=/var/log/file-storage-api/app.log

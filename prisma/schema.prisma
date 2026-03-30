@@ -1,0 +1,259 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+enum Role {
+  SUPER_ADMIN
+  ADMIN
+  EDITOR
+  USER
+  GUEST
+}
+
+enum Permission {
+  // User permissions
+  USER_CREATE
+  USER_READ
+  USER_UPDATE
+  USER_DELETE
+  USER_MANAGE
+
+  // File permissions
+  FILE_UPLOAD
+  FILE_READ
+  FILE_UPDATE
+  FILE_DELETE
+  FILE_DOWNLOAD
+  FILE_SHARE
+
+  // Folder permissions
+  FOLDER_CREATE
+  FOLDER_READ
+  FOLDER_UPDATE
+  FOLDER_DELETE
+
+  // Conversion permissions
+  CONVERSION_PDF_TO_WORD
+  CONVERSION_IMAGE_TO_WORD
+  CONVERSION_BATCH
+
+  // Admin permissions
+  ROLE_MANAGE
+  PERMISSION_MANAGE
+  AUDIT_VIEW
+  SETTINGS_MANAGE
+}
+
+enum FileType {
+  PDF
+  IMAGE
+  WORD
+  OTHER
+}
+
+enum ConversionStatus {
+  PENDING
+  PROCESSING
+  COMPLETED
+  FAILED
+}
+
+enum JobStatus {
+  QUEUED
+  PROCESSING
+  COMPLETED
+  FAILED
+}
+
+model User {
+  id             String            @id @default(uuid())
+  email          String            @unique
+  passwordHash   String
+  firstName      String?
+  lastName       String?
+  avatarUrl      String?
+  role           Role              @default(USER)
+  isActive       Boolean           @default(true)
+  emailVerified  Boolean           @default(false)
+  createdAt      DateTime          @default(now())
+  updatedAt      DateTime          @updatedAt
+  lastLoginAt    DateTime?
+
+  sessions       Session[]
+  userPermissions UserPermission[]
+  files          File[]
+  folders        Folder[]
+  conversionJobs ConversionJob[]
+  auditLogs      AuditLog[]
+
+  @@map("users")
+}
+
+model Session {
+  id           String   @id @default(uuid())
+  userId       String
+  token        String   @unique
+  refreshToken String   @unique
+  userAgent    String?
+  ipAddress    String?
+  expiresAt    DateTime
+  createdAt    DateTime @default(now())
+
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([token])
+  @@map("sessions")
+}
+
+model RolePermission {
+  id         String   @id @default(uuid())
+  role       Role
+  permission Permission
+  createdAt  DateTime @default(now())
+
+  @@unique([role, permission])
+  @@map("role_permissions")
+}
+
+model UserPermission {
+  id         String      @id @default(uuid())
+  userId     String
+  permission Permission
+  resourceId String?     @unique
+  createdAt  DateTime    @default(now())
+
+  user       User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, permission, resourceId])
+  @@index([userId])
+  @@map("user_permissions")
+}
+
+model Folder {
+  id          String      @id @default(uuid())
+  name        String
+  parentId    String?
+  ownerId     String
+  isPublic    Boolean     @default(false)
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+
+  parent      Folder?     @relation("FolderHierarchy", fields: [parentId], references: [id], onDelete: Cascade)
+  children    Folder[]    @relation("FolderHierarchy")
+  owner       User        @relation(fields: [ownerId], references: [id])
+  files       File[]
+
+  @@index([ownerId])
+  @@index([parentId])
+  @@map("folders")
+}
+
+model File {
+  id           String        @id @default(uuid())
+  name         String
+  originalName String
+  mimeType     String
+  fileType     FileType
+  size         Int
+  storagePath  String
+  storageUrl   String?
+  thumbnailUrl String?
+  folderId     String?
+  ownerId      String
+  isPublic     Boolean       @default(false)
+  metadata     Json?
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+
+  folder       Folder?       @relation(fields: [folderId], references: [id], onDelete: SetNull)
+  owner        User          @relation(fields: [ownerId], references: [id])
+  conversions  ConversionJob[]
+
+  @@index([ownerId])
+  @@index([folderId])
+  @@index([fileType])
+  @@map("files")
+}
+
+model ConversionJob {
+  id            String           @id @default(uuid())
+  userId        String
+  sourceFileId  String
+  targetFormat  String
+  status        ConversionStatus @default(PENDING)
+  progress      Int              @default(0)
+  resultUrl     String?
+  resultPath    String?
+  errorMessage  String?
+  metadata      Json?
+  startedAt     DateTime?
+  completedAt   DateTime?
+  createdAt     DateTime         @default(now())
+  updatedAt     DateTime         @updatedAt
+
+  user          User             @relation(fields: [userId], references: [id])
+  sourceFile    File             @relation(fields: [sourceFileId], references: [id])
+
+  @@index([userId])
+  @@index([status])
+  @@map("conversion_jobs")
+}
+
+model JobQueue {
+  id          String    @id @default(uuid())
+  name        String
+  data        Json
+  status      JobStatus @default(QUEUED)
+  priority    Int       @default(0)
+  attempts    Int       @default(0)
+  maxAttempts Int       @default(3)
+  delay       Int       @default(0)
+  result      Json?
+  error       String?
+  scheduledAt DateTime?
+  startedAt   DateTime?
+  completedAt DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@index([name, status])
+  @@index([scheduledAt])
+  @@map("job_queue")
+}
+
+model AuditLog {
+  id         String   @id @default(uuid())
+  userId     String?
+  action     String
+  resource   String
+  resourceId String?
+  changes    Json?
+  ipAddress  String?
+  userAgent  String?
+  createdAt  DateTime @default(now())
+
+  user       User?    @relation(fields: [userId], references: [id])
+
+  @@index([userId])
+  @@index([action])
+  @@index([resource])
+  @@index([createdAt])
+  @@map("audit_logs")
+}
+
+model RefreshToken {
+  id        String   @id @default(uuid())
+  token     String   @unique
+  userId    String
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+  @@map("refresh_tokens")
+}

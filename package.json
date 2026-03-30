@@ -1,0 +1,61 @@
+{
+  "name": "supabase-fastify-boilerplate",
+  "version": "1.0.0",
+  "description": "File storage webapp with PDF reader, conversion, and scalable architecture",
+  "type": "module",
+  "scripts": {
+    "dev": "NODE_ENV=development bun run --watch src/index.ts",
+    "build": "bun build src/index.ts --outdir dist --target node",
+    "start": "bun run dist/index.js",
+    "prisma:generate": "prisma generate",
+    "prisma:migrate": "prisma migrate dev",
+    "prisma:push": "prisma db push",
+    "prisma:studio": "prisma studio",
+    "lint": "eslint src/**/*.ts",
+    "typecheck": "tsc --noEmit",
+    "worker": "bun run src/workers/conversion.worker.ts",
+    "test": "bun test",
+    "test:unit": "bun test tests/unit.test.ts",
+    "test:integration": "bun test tests/integration.test.ts",
+    "test:coverage": "bun test --coverage",
+    "docker:build": "docker build -t file-storage-api .",
+    "docker:up": "docker-compose up -d",
+    "docker:down": "docker-compose down",
+    "docker:logs": "docker-compose logs -f"
+  },
+  "dependencies": {
+    "@fastify/cors": "8.5.0",
+    "@fastify/jwt": "7.2.4",
+    "@fastify/multipart": "8.1.0",
+    "@fastify/rate-limit": "9.1.0",
+    "@fastify/swagger": "8.14.0",
+    "@prisma/client": "5.14.0",
+    "@scalar/fastify-api-reference": "latest",
+    "@supabase/supabase-js": "2.43.4",
+    "bcryptjs": "2.4.3",
+    "bullmq": "5.10.0",
+    "docx": "^9.6.1",
+    "dotenv": "16.4.5",
+    "fastify": "4.28.0",
+    "fastify-plugin": "4.5.1",
+    "ioredis": "5.4.0",
+    "pdf-parse": "1.1.1",
+    "pino": "8.19.0",
+    "pino-pretty": "11.2.0",
+    "sharp": "0.33.4",
+    "uuid": "9.0.1",
+    "zod": "3.23.8"
+  },
+  "devDependencies": {
+    "@types/bcryptjs": "2.4.6",
+    "@types/bun": "1.1.3",
+    "@types/node": "20.12.12",
+    "@types/uuid": "9.0.8",
+    "prisma": "5.14.0",
+    "typescript": "5.4.5"
+  },
+  "trustedDependencies": [
+    "@prisma/client",
+    "prisma"
+  ]
+}

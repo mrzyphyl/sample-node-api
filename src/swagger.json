@@ -1,0 +1,34 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "File Storage & Conversion API",
+    "version": "1.0.0",
+    "description": "A scalable file storage API with PDF/Image to Word conversion"
+  },
+  "servers": [
+    {
+      "url": "http://localhost:3000/api/v1",
+      "description": "Development server"
+    }
+  ],
+  "components": {
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      }
+    },
+    "schemas": {
+      "Error": {
+        "type": "object",
+        "properties": {
+          "statusCode": { "type": "integer" },
+          "error": { "type": "string" },
+          "message": { "type": "string" }
+        }
+      }
+    }
+  },
+  "security": [{ "bearerAuth": [] }]
+}
