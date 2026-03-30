@@ -18,6 +18,8 @@
     "test:unit": "bun test tests/unit.test.ts",
     "test:integration": "bun test tests/integration.test.ts",
     "test:coverage": "bun test --coverage",
+    "docker:dev": "docker-compose up -d",
+    "docker:dev:stop": "docker-compose down",
     "docker:build": "docker build -t file-storage-api .",
     "docker:up": "docker-compose up -d",
     "docker:down": "docker-compose down",
